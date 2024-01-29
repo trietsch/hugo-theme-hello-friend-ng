@@ -1,7 +1,7 @@
 /**
  * Theming.
  *
- * Supports the preferred color scheme of the operation system as well as
+ * Supports the preferred color scheme of the operating system as well as
  * the theme choice of the user.
  *
  */
@@ -13,50 +13,62 @@ const templateSrc = document.getElementById("logo").attributes["template-src"].v
 
 // Detect the color scheme the operating system prefers.
 function detectOSColorTheme() {
-  if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    document.documentElement.setAttribute("data-theme", "dark");
-  } else {
-    document.documentElement.setAttribute("data-theme", "light");
-  }
+    let osPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    let osPrefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+    let previousOsPreference = localStorage.getItem("osTheme");
+    let currentOsPreference = osPrefersDark ? "dark" : "light";
 
-  if (chosenThemeIsDark) {
-    document.documentElement.setAttribute("data-theme", "dark");
-    document.getElementById("logo").src = templateSrc.replace("$theme", "dark");
-  } else if (chosenThemeIsLight) {
-    document.documentElement.setAttribute("data-theme", "light");
-    document.getElementById("logo").src = templateSrc.replace("$theme", "light");
-  }
+    if (localStorage.getItem("theme") !== null && previousOsPreference === currentOsPreference) {
+        setTheme(localStorage.getItem("theme"));
+        return;
+    }
+
+
+    if (osPrefersDark) {
+        localStorage.removeItem("theme");
+        localStorage.setItem("osTheme", "dark");
+        setTheme("dark");
+    } else if (osPrefersLight) {
+        localStorage.removeItem("theme");
+        localStorage.setItem("osTheme", "light");
+        setTheme("light");
+    }
 }
 
-// Switch the theme.
-function switchTheme(e) {
-  if (chosenThemeIsDark) {
-    localStorage.setItem("theme", "light");
-  } else if (chosenThemeIsLight) {
-    localStorage.setItem("theme", "dark");
-  } else {
-    if (document.documentElement.getAttribute("data-theme") == "dark") {
-      localStorage.setItem("theme", "light");
-    } else {
-      localStorage.setItem("theme", "dark");
-    }
-  }
+function setTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    document.getElementById("logo").src = templateSrc.replace("$theme", theme);
+}
 
-  detectOSColorTheme();
-  window.location.reload();
+function toggleTheme(e) {
+    if (chosenThemeIsDark) {
+        localStorage.setItem("theme", "light");
+    } else if (chosenThemeIsLight) {
+        localStorage.setItem("theme", "dark");
+    } else {
+        if (document.documentElement.getAttribute("data-theme") == "dark") {
+            localStorage.setItem("theme", "light");
+        } else {
+            localStorage.setItem("theme", "dark");
+        }
+    }
+
+    setTheme(localStorage.getItem("theme"));
+
+    window.location.reload();
 }
 
 // Event listener
 if (themeToggle) {
-  themeToggle.addEventListener("click", switchTheme, false);
-  window
-    .matchMedia("(prefers-color-scheme: dark)")
-    .addEventListener("change", (e) => e.matches && detectOSColorTheme());
-  window
-    .matchMedia("(prefers-color-scheme: light)")
-    .addEventListener("change", (e) => e.matches && detectOSColorTheme());
+    themeToggle.addEventListener("click", toggleTheme, false);
+    window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", (e) => e.matches && detectOSColorTheme());
+    window
+        .matchMedia("(prefers-color-scheme: light)")
+        .addEventListener("change", (e) => e.matches && detectOSColorTheme());
 
-  detectOSColorTheme();
+    detectOSColorTheme();
 } else {
-  localStorage.removeItem("theme");
+    localStorage.removeItem("theme");
 }
