@@ -1,4 +1,8 @@
-<section class="imageandtext">
-    <div id="image"><img src='{{ .Get "img" }}'></div>
-    <div id="text">{{ .Get "text" | safeHTML }}</div>
-</section>
+<div class="flex-container">
+    <div class="image-container">
+        <img src='{{ .Get "img" }}'>
+    </div>
+    <div class="text-container">
+        <p>{{ .Get "text" | safeHTML }}</p>
+    </div>
+</div>
